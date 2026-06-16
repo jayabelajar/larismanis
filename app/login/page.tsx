@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
 import { LoginForm } from "@/components/login-form";
 import { SiteShell } from "@/components/site-shell";
-import { authOptions, googleAuthEnabled } from "@/lib/auth";
+import { googleAuthEnabled } from "@/lib/supabase/config";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
   title: "Login",
@@ -14,9 +14,12 @@ export const metadata = {
 };
 
 export default async function LoginPage() {
-  const session = await getServerSession(authOptions);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (session?.user) {
+  if (user) {
     redirect("/account");
   }
 

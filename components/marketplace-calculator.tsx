@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Save, Trash2 } from "lucide-react";
 import { calculateSellingPrice } from "@/lib/calculator";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { DEFAULT_PRESETS, getPresetByKey } from "@/lib/presets";
 import { loadHistory, loadPresets, saveHistory } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 import {
   CalculationHistoryItem,
   CalculatorForm,
@@ -75,7 +75,7 @@ function Field({
 
 export function MarketplaceCalculator() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [presets] = useState<SalesChannelPreset[]>(() => loadPresets() ?? DEFAULT_PRESETS);
   const [form, setForm] = useState<CalculatorForm>(() => {
     const activePreset = (loadPresets() ?? DEFAULT_PRESETS).find(
@@ -99,6 +99,24 @@ export function MarketplaceCalculator() {
       : initialForm;
   });
   const [saveMessage, setSaveMessage] = useState("");
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user?.email ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const result = useMemo(() => calculateSellingPrice(form), [form]);
 
@@ -147,7 +165,6 @@ export function MarketplaceCalculator() {
   }
 
   function saveCurrentCalculation() {
-    const userEmail = session?.user?.email;
     if (!userEmail) {
       router.push("/login?callbackUrl=/history");
       return;
@@ -297,7 +314,7 @@ export function MarketplaceCalculator() {
             <Trash2 className="h-4 w-4" />
             Reset input
           </button>
-          {!session?.user ? (
+          {!userEmail ? (
             <p className="self-center text-sm text-slate-500">
               Riwayat butuh login.{" "}
               <Link href="/login" className="font-semibold text-emerald-700">

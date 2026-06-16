@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Chrome, LogIn } from "lucide-react";
-import { signIn } from "next-auth/react";
 import { loginSchema } from "@/lib/auth-schema";
+import { createClient } from "@/lib/supabase/client";
 
 export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
+  const router = useRouter();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [googlePending, setGooglePending] = useState(false);
@@ -26,26 +28,54 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     setPending(true);
     setError("");
 
-    const result = await signIn("credentials", {
+    const supabase = createClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email: parsed.data.email,
       password: parsed.data.password,
-      redirect: false,
-      callbackUrl: "/account",
     });
 
     setPending(false);
 
-    if (!result || result.error) {
-      setError("Email atau password salah.");
+    if (signInError) {
+      setError("Email atau password salah, atau akun belum aktif.");
       return;
     }
 
-    window.location.href = result.url ?? "/account";
+    router.replace("/account");
+    router.refresh();
   }
 
   async function handleGoogleLogin() {
     setGooglePending(true);
-    await signIn("google", { callbackUrl: "/account" });
+    setError("");
+
+    try {
+      const supabase = createClient();
+      const { data, error: signInError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/account`,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (signInError) {
+        setError("Login Google belum aktif. Cek konfigurasi Google provider di Supabase.");
+        setGooglePending(false);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      setError("Gagal mengarahkan ke login Google.");
+    } catch {
+      setError("Gagal memulai login Google.");
+    }
+
+    setGooglePending(false);
   }
 
   return (

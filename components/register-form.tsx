@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Chrome, UserPlus } from "lucide-react";
-import { signIn } from "next-auth/react";
 import { registerSchema } from "@/lib/auth-schema";
+import { createClient } from "@/lib/supabase/client";
 
 export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
+  const router = useRouter();
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [pending, setPending] = useState(false);
   const [googlePending, setGooglePending] = useState(false);
 
@@ -26,42 +29,73 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
 
     setPending(true);
     setError("");
+    setSuccess("");
 
-    const response = await fetch("/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(parsed.data),
-    });
+    try {
+      const supabase = createClient();
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: parsed.data.email,
+        password: parsed.data.password,
+        options: {
+          data: {
+            name: parsed.data.name,
+          },
+        },
+      });
 
-    if (!response.ok) {
-      const data = (await response.json()) as { message?: string };
+      if (signUpError) {
+        setError(
+          signUpError.message.includes("already registered")
+            ? "Email sudah terdaftar. Silakan login."
+            : "Gagal membuat akun.",
+        );
+        return;
+      }
+
+      if (data.session) {
+        router.replace("/account");
+        router.refresh();
+        return;
+      }
+
+      setSuccess("Akun berhasil dibuat. Kalau verifikasi email aktif, cek inbox kamu lalu lanjut login.");
+    } finally {
       setPending(false);
-      setError(data.message ?? "Gagal membuat akun.");
-      return;
     }
-
-    const result = await signIn("credentials", {
-      email: parsed.data.email,
-      password: parsed.data.password,
-      redirect: false,
-      callbackUrl: "/account",
-    });
-
-    setPending(false);
-
-    if (!result || result.error) {
-      window.location.href = "/login";
-      return;
-    }
-
-    window.location.href = result.url ?? "/account";
   }
 
   async function handleGoogleRegister() {
     setGooglePending(true);
-    await signIn("google", { callbackUrl: "/account" });
+    setError("");
+    setSuccess("");
+
+    try {
+      const supabase = createClient();
+      const { data, error: signInError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/account`,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (signInError) {
+        setError("Daftar dengan Google belum aktif. Cek konfigurasi Google provider di Supabase.");
+        setGooglePending(false);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      setError("Gagal mengarahkan ke Google.");
+    } catch {
+      setError("Gagal memulai autentikasi Google.");
+    }
+
+    setGooglePending(false);
   }
 
   return (
@@ -105,6 +139,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
           />
         </label>
         {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+        {success ? <p className="text-sm text-emerald-700">{success}</p> : null}
         <button
           type="submit"
           disabled={pending}

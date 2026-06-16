@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
 import { HistoryClient } from "@/components/history-client";
 import { SiteShell } from "@/components/site-shell";
-import { authOptions } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
   title: "Riwayat Kalkulasi",
@@ -14,9 +13,12 @@ export const metadata = {
 };
 
 export default async function HistoryPage() {
-  const session = await getServerSession(authOptions);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session?.user?.email) {
+  if (!user?.email) {
     redirect("/login?callbackUrl=/history");
   }
 
@@ -25,7 +27,7 @@ export default async function HistoryPage() {
       title="Riwayat kalkulasi"
       description="Daftar hasil hitung dari channel online maupun offline yang sudah disimpan untuk akun yang sedang login."
     >
-      <HistoryClient userEmail={session.user.email} />
+      <HistoryClient userEmail={user.email} />
     </SiteShell>
   );
 }

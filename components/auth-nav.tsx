@@ -1,21 +1,15 @@
-"use client";
-
 import Link from "next/link";
-import { LogOut, UserCircle2 } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { UserCircle2 } from "lucide-react";
+import { LogoutButton } from "@/components/logout-button";
+import { createClient } from "@/lib/supabase/server";
 
-export function AuthNav() {
-  const { data: session, status } = useSession();
+export async function AuthNav() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (status === "loading") {
-    return (
-      <div className="hidden items-center gap-3 md:flex">
-        <div className="h-10 w-28 animate-pulse rounded-xl bg-slate-100" />
-      </div>
-    );
-  }
-
-  if (!session?.user) {
+  if (!user) {
     return (
       <div className="hidden items-center gap-2 md:flex">
         <Link
@@ -41,16 +35,9 @@ export function AuthNav() {
         className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
       >
         <UserCircle2 className="h-4 w-4" />
-        <span>{session.user.name ?? session.user.email}</span>
+        <span>{user.user_metadata?.name ?? user.user_metadata?.full_name ?? user.email}</span>
       </Link>
-      <button
-        type="button"
-        onClick={() => signOut({ callbackUrl: "/" })}
-        className="inline-flex h-10 items-center gap-2 rounded-xl bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800"
-      >
-        <LogOut className="h-4 w-4" />
-        Keluar
-      </button>
+      <LogoutButton />
     </div>
   );
 }

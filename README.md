@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LarisManis
 
-## Getting Started
+LarisManis is a web application for estimating selling prices across online and offline sales channels. It helps sellers model platform fees, fixed costs, operating costs, target profit, and pricing scenarios in a single workflow.
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The project is built with the Next.js App Router and focuses on practical pricing workflows for marketplace sellers, food delivery merchants, resellers, and offline stores. In addition to price calculation, the application includes account authentication and browser-based calculation history.
+
+## Key Features
+
+- Multi-channel selling price calculator for online and offline sales
+- Configurable fee presets for common sales channels
+- Profit, margin, and payout simulation
+- Saved calculation history per signed-in user
+- Authentication with Supabase Auth, including email/password and Google sign-in
+
+## Tech Stack
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Supabase Auth
+- Zod
+
+## Project Structure
+
+- `app/` application routes and server-rendered pages
+- `components/` reusable UI components
+- `lib/` business logic, storage helpers, types, and Supabase utilities
+- `public/` static assets
+
+## Environment Variables
+
+Create a `.env` file based on `.env.example`.
+
+Required variables:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Install dependencies and start the development server:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+The application runs locally at `http://localhost:3000`.
 
-To learn more about Next.js, take a look at the following resources:
+## Available Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` start the local development server
+- `npm run build` create a production build
+- `npm run start` run the production build locally
+- `npm run lint` run static lint checks
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notes
 
-## Deploy on Vercel
+- Authentication depends on a properly configured Supabase project.
+- Calculation history is stored in the browser for the signed-in user context used by the app.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is private and intended for internal development unless stated otherwise.
