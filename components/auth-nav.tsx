@@ -14,13 +14,13 @@ export async function AuthNav() {
       <div className="hidden items-center gap-2 md:flex">
         <Link
           href="/login"
-          className="inline-flex h-10 items-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          className="inline-flex h-10 items-center rounded-xl border border-border-color bg-background/50 px-4.5 text-sm font-medium text-text-muted transition hover:bg-accent-light hover:text-accent hover:border-accent/10"
         >
           Login
         </Link>
         <Link
           href="/register"
-          className="inline-flex h-10 items-center rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white transition hover:bg-emerald-700"
+          className="inline-flex h-10 items-center rounded-xl bg-accent px-4.5 text-sm font-semibold text-background shadow-sm transition hover:bg-accent-hover"
         >
           Daftar
         </Link>
@@ -32,9 +32,9 @@ export async function AuthNav() {
     <div className="hidden items-center gap-3 md:flex">
       <Link
         href="/account"
-        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+        className="inline-flex h-10 items-center gap-2 rounded-xl border border-border-color bg-background/50 px-4 text-sm font-medium text-text-muted transition hover:bg-accent-light hover:text-accent hover:border-accent/10"
       >
-        <UserCircle2 className="h-4 w-4" />
+        <UserCircle2 className="h-4 w-4 stroke-[1.8]" />
         <span>{user.user_metadata?.name ?? user.user_metadata?.full_name ?? user.email}</span>
       </Link>
       <LogoutButton />

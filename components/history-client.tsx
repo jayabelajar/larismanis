@@ -17,12 +17,16 @@ export function HistoryClient({ userEmail }: { userEmail: string }) {
 
   if (!items.length) {
     return (
-      <section className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-        <Clock3 className="mx-auto h-10 w-10 text-slate-300" />
-        <h2 className="mt-4 text-lg font-semibold text-slate-950">Belum ada riwayat</h2>
-        <p className="mt-2 text-sm text-slate-500">
-          Simpan hasil kalkulasi dari halaman kalkulator setelah login. Riwayat tersimpan per akun di browser ini.
-        </p>
+      <section className="rounded-3xl border-2 border-dashed border-darkText bg-white p-12 text-center shadow-brutal flex flex-col items-center justify-center gap-4">
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border-2 border-darkText bg-brutalYellow text-darkText shadow-brutal-sm">
+          <Clock3 className="h-6 w-6" />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <h3 className="text-xl font-extrabold text-darkText">Belum ada riwayat</h3>
+          <p className="text-xs font-semibold text-darkText/70 max-w-sm leading-relaxed">
+            Simpan hasil kalkulasi dari halaman kalkulator setelah login. Riwayat tersimpan per akun di browser ini.
+          </p>
+        </div>
       </section>
     );
   }
@@ -30,61 +34,61 @@ export function HistoryClient({ userEmail }: { userEmail: string }) {
   return (
     <div className="grid gap-6">
       <div className="flex items-center justify-between gap-4">
-        <p className="text-sm text-slate-500">
-          Menampilkan {items.length} kalkulasi terbaru untuk akun yang sedang login.
+        <p className="text-xs font-semibold text-darkText/75">
+          Menampilkan {items.length} kalkulasi terbaru untuk akun Anda.
         </p>
         <button
           type="button"
           onClick={clearHistory}
-          className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          className="btn-brutal inline-flex h-10 items-center gap-2 rounded-xl border-2 border-darkText bg-brutalRed text-white px-4 text-sm font-bold shadow-brutal-sm hover:shadow-brutal cursor-pointer"
         >
           <Trash2 className="h-4 w-4" />
-          Hapus semua
+          Hapus Semua
         </button>
       </div>
-      <div className="grid gap-4">
+      <div className="grid gap-6">
         {items.map((item) => {
           const preset = getPresetByKey(item.channel);
           return (
-            <article key={item.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            <article key={item.id} className="rounded-3xl border-2 border-darkText bg-white p-6 shadow-brutal sm:p-8 flex flex-col gap-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between border-b-2 border-darkText pb-5">
+                <div className="flex flex-col gap-1.5">
+                  <span className="w-fit rounded-lg bg-brutalYellow border-2 border-darkText px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-darkText shadow-brutal-sm">
                     {item.mode} · {preset.label}
-                  </p>
-                  <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
+                  </span>
+                  <h3 className="text-lg font-extrabold text-darkText">
                     {item.productName}
-                  </h2>
-                  <p className="mt-2 text-sm text-slate-500">
+                  </h3>
+                  <p className="text-xs font-semibold text-darkText/60">
                     {new Intl.DateTimeFormat("id-ID", {
                       dateStyle: "medium",
                       timeStyle: "short",
                     }).format(new Date(item.createdAt))}
                   </p>
                 </div>
-                <div className="rounded-xl bg-slate-50 px-4 py-3 text-right">
-                  <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Harga aman</p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-950">
+                <div className="rounded-xl bg-brutalGreen px-4.5 py-3 border-2 border-darkText shadow-brutal-sm sm:text-right">
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-darkText/80">Harga Aman</p>
+                  <p className="mt-1 text-2xl font-extrabold text-darkText">
                     {formatCurrency(item.recommendedPrice)}
                   </p>
                 </div>
               </div>
-              <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                <div>
-                  <dt className="text-slate-500">Harga minimal</dt>
-                  <dd className="mt-1 font-semibold text-slate-950">{formatCurrency(item.minimumPrice)}</dd>
+              <dl className="grid gap-4 grid-cols-2 lg:grid-cols-4 text-xs">
+                <div className="flex flex-col gap-1">
+                  <dt className="text-darkText/70 font-bold">Harga Minimal</dt>
+                  <dd className="font-extrabold text-darkText">{formatCurrency(item.minimumPrice)}</dd>
                 </div>
-                <div>
-                  <dt className="text-slate-500">Harga simulasi</dt>
-                  <dd className="mt-1 font-semibold text-slate-950">{formatCurrency(item.desiredPrice)}</dd>
+                <div className="flex flex-col gap-1">
+                  <dt className="text-darkText/70 font-bold">Harga Uji</dt>
+                  <dd className="font-extrabold text-darkText">{formatCurrency(item.desiredPrice)}</dd>
                 </div>
-                <div>
-                  <dt className="text-slate-500">Profit simulasi</dt>
-                  <dd className="mt-1 font-semibold text-slate-950">{formatCurrency(item.netProfit)}</dd>
+                <div className="flex flex-col gap-1">
+                  <dt className="text-darkText/70 font-bold">Profit Bersih</dt>
+                  <dd className="font-extrabold text-brutalRed">{formatCurrency(item.netProfit)}</dd>
                 </div>
-                <div>
-                  <dt className="text-slate-500">Margin</dt>
-                  <dd className="mt-1 font-semibold text-slate-950">{formatPercent(item.margin)}</dd>
+                <div className="flex flex-col gap-1">
+                  <dt className="text-darkText/70 font-bold">Margin</dt>
+                  <dd className="font-extrabold text-darkText">{formatPercent(item.margin)}</dd>
                 </div>
               </dl>
             </article>

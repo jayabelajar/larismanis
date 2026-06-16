@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
+import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-space-grotesk",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://larismanis.id"),
@@ -50,7 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="h-full antialiased">
+    <html lang="id" className={`scroll-smooth h-full antialiased ${spaceGrotesk.variable}`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

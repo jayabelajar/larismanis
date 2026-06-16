@@ -39,18 +39,18 @@ export default async function AccountPage() {
       title="Akun"
       description="Status login aktif untuk akun yang sedang dipakai di aplikasi ini."
     >
-      <section className="mx-auto grid w-full max-w-2xl gap-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <div>
-          <p className="text-sm text-slate-500">Nama</p>
-          <p className="mt-2 text-xl font-semibold text-slate-950">{name}</p>
+      <section className="mx-auto grid w-full max-w-2xl gap-6 rounded-3xl border-2 border-darkText bg-white p-6 shadow-brutal sm:p-8 divide-y-2 divide-darkText">
+        <div className="flex flex-col gap-1">
+          <p className="text-[11px] font-extrabold uppercase tracking-wider text-darkText/70">Nama</p>
+          <p className="text-lg font-extrabold text-darkText">{name}</p>
         </div>
-        <div>
-          <p className="text-sm text-slate-500">Email</p>
-          <p className="mt-2 text-base font-medium text-slate-900">{user.email ?? "-"}</p>
+        <div className="flex flex-col gap-1 pt-4 first:pt-0">
+          <p className="text-[11px] font-extrabold uppercase tracking-wider text-darkText/70">Email</p>
+          <p className="text-base font-extrabold text-darkText">{user.email ?? "-"}</p>
         </div>
-        <div>
-          <p className="text-sm text-slate-500">Metode login</p>
-          <p className="mt-2 text-base font-medium text-slate-900">{providerLabel}</p>
+        <div className="flex flex-col gap-1 pt-4 first:pt-0">
+          <p className="text-[11px] font-extrabold uppercase tracking-wider text-darkText/70">Metode Login</p>
+          <p className="text-base font-extrabold text-darkText">{providerLabel}</p>
         </div>
       </section>
     </SiteShell>

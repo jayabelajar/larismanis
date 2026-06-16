@@ -27,9 +27,9 @@ export function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={pending}
-      className="inline-flex h-10 items-center gap-2 rounded-xl bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex h-10 items-center gap-2 rounded-xl border border-border-color bg-background/50 px-4 text-sm font-medium text-text-muted transition hover:bg-rose-50/60 hover:text-rose-600 hover:border-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
     >
-      <LogOut className="h-4 w-4" />
+      <LogOut className="h-4 w-4 stroke-[1.8]" />
       {pending ? "Keluar..." : "Keluar"}
     </button>
   );

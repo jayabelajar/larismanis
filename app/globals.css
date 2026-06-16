@@ -1,24 +1,42 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f8fb;
-  --foreground: #0f172a;
-  --color-canvas: #f6f8fb;
+  --background: #fbf8f1; /* bgLight */
+  --foreground: #1a1a1a; /* darkText */
+  --color-canvas: #fbf8f1;
+  
+  --bg-light: #fbf8f1;
+  --brutal-red: #ff6b6b;
+  --brutal-blue: #4ecdc4;
+  --brutal-yellow: #ffe66d;
+  --brutal-purple: #c7b9ff;
+  --brutal-green: #a8e6cf;
+  --dark-text: #1a1a1a;
+  
+  --shadow-brutal: 4px 4px 0px 0px rgba(26, 26, 26, 1);
+  --shadow-brutal-hover: 6px 6px 0px 0px rgba(26, 26, 26, 1);
+  --shadow-brutal-sm: 2px 2px 0px 0px rgba(26, 26, 26, 1);
+  
+  --font-space-grotesk: var(--font-space-grotesk), "Inter", system-ui, -apple-system, sans-serif;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Inter", "Segoe UI", Arial, Helvetica, sans-serif;
-  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #f6f8fb;
-    --foreground: #0f172a;
-    --color-canvas: #f6f8fb;
-  }
+  --color-canvas: var(--color-canvas);
+  --color-bgLight: var(--bg-light);
+  --color-brutalRed: var(--brutal-red);
+  --color-brutalBlue: var(--brutal-blue);
+  --color-brutalYellow: var(--brutal-yellow);
+  --color-brutalPurple: var(--brutal-purple);
+  --color-brutalGreen: var(--brutal-green);
+  --color-darkText: var(--dark-text);
+  
+  --shadow-brutal: var(--shadow-brutal);
+  --shadow-brutal-hover: var(--shadow-brutal-hover);
+  --shadow-brutal-sm: var(--shadow-brutal-sm);
+  
+  --font-sans: var(--font-space-grotesk);
 }
 
 * {
@@ -32,18 +50,65 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Inter", "Segoe UI", Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
 
+/* Custom premium scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--dark-text);
+  border: 2px solid var(--background);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brutal-red);
+}
+
+/* Beautiful soft interactive elements */
 a,
 button,
 input,
-select {
-  transition-property: color, background-color, border-color, box-shadow, opacity;
+select,
+textarea {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
   transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 ::selection {
-  background: #bbf7d0;
-  color: #052e16;
+  background: var(--brutal-yellow);
+  color: var(--dark-text);
+}
+
+/* Neo-Brutalist utilities */
+.btn-brutal {
+  transition: all 0.1s ease;
+}
+.btn-brutal:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px rgba(26, 26, 26, 1) !important;
+}
+
+/* Keep compatibility with old classes but map them to Brutalist styles */
+.soft-shadow {
+  box-shadow: var(--shadow-brutal);
+}
+
+.soft-shadow-inset {
+  box-shadow: inset 2px 2px 0px 0px rgba(26, 26, 26, 0.1);
+}
+
+.soft-card {
+  background: white;
+  border: 2px solid var(--dark-text);
+  box-shadow: var(--shadow-brutal);
 }

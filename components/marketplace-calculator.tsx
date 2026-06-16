@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Save, Trash2 } from "lucide-react";
+import { ChevronDown, Save, Trash2 } from "lucide-react";
 import { calculateSellingPrice } from "@/lib/calculator";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { DEFAULT_PRESETS, getPresetByKey } from "@/lib/presets";
@@ -42,29 +42,41 @@ function Field({
   label,
   name,
   value,
+  prefix,
   suffix,
   onChange,
 }: {
   label: string;
   name: keyof CalculatorForm;
   value: number;
+  prefix?: string;
   suffix?: string;
   onChange: (name: keyof CalculatorForm, value: number) => void;
 }) {
   return (
-    <label className="flex flex-col gap-2 text-sm text-slate-700">
-      <span className="font-medium">{label}</span>
-      <div className="relative">
+    <label className="flex flex-col gap-2 text-xs font-extrabold uppercase tracking-wider text-darkText">
+      <span>{label}</span>
+      <div className="relative flex items-center w-full">
+        {prefix ? (
+          <span className="pointer-events-none absolute left-4 text-xs font-extrabold text-darkText/60">
+            {prefix}
+          </span>
+        ) : null}
         <input
-          className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 pr-14 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-emerald-500"
+          className={`h-11 w-full rounded-xl border-2 border-darkText bg-white ${
+            prefix ? "pl-10" : "pl-4"
+          } ${
+            suffix ? "pr-16" : "pr-4"
+          } text-sm font-bold text-darkText outline-none transition-all placeholder:text-darkText/45 focus:bg-white focus:ring-4 focus:ring-brutalBlue/40`}
           type="number"
           min="0"
-          step="0.1"
-          value={value}
+          step="any"
+          value={value === 0 ? "" : value}
           onChange={(event) => onChange(name, Number(event.target.value))}
+          placeholder="0"
         />
         {suffix ? (
-          <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-xs font-medium text-slate-400">
+          <span className="absolute right-2 text-[10px] font-extrabold text-darkText bg-brutalYellow px-2 py-0.5 rounded-lg border-2 border-darkText shadow-brutal-sm">
             {suffix}
           </span>
         ) : null}
@@ -158,6 +170,12 @@ export function MarketplaceCalculator() {
     applyPreset(nextPreset);
   }
 
+  // Calculate recommendation breakdown percentages for visual fee breakdown bar
+  const totalRecommended = result.recommendedPrice || 1;
+  const basePct = Math.max(0, Math.min(100, (result.totalBaseCost / totalRecommended) * 100));
+  const feePct = Math.max(0, Math.min(100, (result.totalMarketplaceCut / totalRecommended) * 100));
+  const profitPct = Math.max(0, Math.min(100, (result.netProfitAtRecommended / totalRecommended) * 100));
+
   function resetForm() {
     applyPreset(getPresetByKey("shopee"));
     setForm(initialForm);
@@ -186,33 +204,36 @@ export function MarketplaceCalculator() {
     };
 
     saveHistory(userEmail, [item, ...history].slice(0, 25));
-    setSaveMessage("Riwayat kalkulasi tersimpan untuk akun ini di browser.");
+    setSaveMessage("Riwayat kalkulasi tersimpan di browser ini.");
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
-      <section className="grid gap-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="flex flex-col gap-2 text-sm text-slate-700 sm:col-span-2">
-              <span className="font-medium">Nama produk</span>
+    <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+      <section className="grid gap-8">
+        {/* Panel Info & Saluran */}
+        <div className="rounded-3xl border-2 border-darkText bg-white p-6 shadow-brutal sm:p-8 flex flex-col gap-6">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="flex flex-col gap-2 text-xs font-extrabold uppercase tracking-wider text-darkText sm:col-span-2">
+              <span>Nama Produk</span>
               <input
-                className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-emerald-500"
+                className="h-11 rounded-xl border-2 border-darkText bg-white px-4 text-sm font-bold text-darkText outline-none transition-all placeholder:text-darkText/45 focus:bg-white focus:ring-4 focus:ring-brutalBlue/40"
                 placeholder="Contoh: Kemeja Linen Premium"
                 value={form.productName}
                 onChange={(event) => updateField("productName", event.target.value)}
               />
             </label>
-            <label className="flex flex-col gap-2 text-sm text-slate-700">
-              <span className="font-medium">Mode penjualan</span>
-              <div className="grid h-11 grid-cols-2 rounded-xl bg-slate-100 p-1">
+            <label className="flex flex-col gap-2 text-xs font-extrabold uppercase tracking-wider text-darkText">
+              <span>Mode Penjualan</span>
+              <div className="grid h-11 grid-cols-2 rounded-xl bg-white p-1 border-2 border-darkText shadow-brutal-sm">
                 {(["online", "offline"] as const).map((mode) => (
                   <button
                     key={mode}
                     type="button"
                     onClick={() => handleModeChange(mode)}
-                    className={`rounded-lg text-sm font-medium capitalize ${
-                      form.mode === mode ? "bg-white text-slate-950 shadow-sm" : "text-slate-500"
+                    className={`rounded-lg text-[10px] md:text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
+                      form.mode === mode
+                        ? "bg-brutalBlue text-darkText border-2 border-darkText shadow-brutal-sm"
+                        : "text-darkText hover:bg-bgLight"
                     }`}
                   >
                     {mode}
@@ -220,165 +241,230 @@ export function MarketplaceCalculator() {
                 ))}
               </div>
             </label>
-            <label className="flex flex-col gap-2 text-sm text-slate-700">
-              <span className="font-medium">
-                {form.mode === "online" ? "Channel penjualan" : "Channel offline"}
+            <label className="flex flex-col gap-2 text-xs font-extrabold uppercase tracking-wider text-darkText">
+              <span>
+                {form.mode === "online" ? "Channel Penjualan" : "Channel Offline"}
               </span>
-              <select
-                className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-950 outline-none transition focus:border-emerald-500"
-                value={form.channel}
-                onChange={(event) => handleChannelChange(event.target.value as SalesChannelKey)}
-              >
-                {channelPresets.map((preset) => (
-                  <option key={preset.key} value={preset.key}>
-                    {preset.label}
-                  </option>
-                ))}
-              </select>
+              <div className="relative flex items-center">
+                <select
+                  className="h-11 w-full rounded-xl border-2 border-darkText bg-white pl-4 pr-10 text-sm font-bold text-darkText outline-none transition-all focus:bg-white focus:ring-4 focus:ring-brutalBlue/40 appearance-none cursor-pointer"
+                  value={form.channel}
+                  onChange={(event) => handleChannelChange(event.target.value as SalesChannelKey)}
+                >
+                  {channelPresets.map((preset) => (
+                    <option key={preset.key} value={preset.key}>
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute right-4 text-darkText">
+                  <ChevronDown className="h-4 w-4" />
+                </div>
+              </div>
             </label>
-            <label className="flex flex-col gap-2 text-sm text-slate-700">
-              <span className="font-medium">Preset aktif</span>
-              <div className="flex h-11 items-center rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-600">
+            <label className="flex flex-col gap-2 text-xs font-extrabold uppercase tracking-wider text-darkText">
+              <span>Preset Aktif</span>
+              <div className="flex h-11 items-center rounded-xl border-2 border-darkText bg-brutalGreen px-4 text-sm font-extrabold text-darkText shadow-brutal-sm">
                 {activeChannel?.label ?? "-"}
               </div>
             </label>
-            <Field label="Harga jual simulasi" name="desiredPrice" value={form.desiredPrice} onChange={updateField} />
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-slate-950">Biaya produk</h2>
-            <p className="text-sm text-slate-500">Masukkan modal inti dan target profit per produk.</p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Modal produk" name="productCost" value={form.productCost} onChange={updateField} />
-            <Field label="Biaya packing" name="packingCost" value={form.packingCost} onChange={updateField} />
             <Field
-              label="Biaya operasional"
-              name="operationalCost"
-              value={form.operationalCost}
+              label="Harga Jual Simulasi"
+              name="desiredPrice"
+              value={form.desiredPrice}
+              prefix="Rp"
               onChange={updateField}
             />
-            <Field label="Target keuntungan" name="targetProfit" value={form.targetProfit} onChange={updateField} />
-            <Field label="Biaya tetap transaksi" name="fixedFee" value={form.fixedFee} onChange={updateField} />
-            <Field label="Voucher seller" name="sellerVoucher" value={form.sellerVoucher} onChange={updateField} />
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-slate-950">Persentase potongan channel</h2>
-            <p className="text-sm text-slate-500">
-              Cocok untuk marketplace, merchant food delivery, atau penjualan offline dengan komisi reseller.
+        {/* Panel Biaya Produk */}
+        <div className="rounded-3xl border-2 border-darkText bg-white p-6 shadow-brutal sm:p-8 flex flex-col gap-6">
+          <div className="flex flex-col gap-1 border-b-2 border-darkText pb-4">
+            <h3 className="text-xl font-extrabold text-darkText">Biaya Produk & Target</h3>
+            <p className="text-xs font-semibold text-darkText/70 leading-relaxed">Masukkan modal per unit dan keuntungan bersih yang dibidik.</p>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Modal Produk" name="productCost" value={form.productCost} prefix="Rp" onChange={updateField} />
+            <Field label="Biaya Packing" name="packingCost" value={form.packingCost} prefix="Rp" onChange={updateField} />
+            <Field
+              label="Biaya Operasional"
+              name="operationalCost"
+              value={form.operationalCost}
+              prefix="Rp"
+              onChange={updateField}
+            />
+            <Field label="Target Keuntungan" name="targetProfit" value={form.targetProfit} prefix="Rp" onChange={updateField} />
+            <Field label="Biaya Tetap Transaksi" name="fixedFee" value={form.fixedFee} prefix="Rp" onChange={updateField} />
+            <Field label="Voucher Seller" name="sellerVoucher" value={form.sellerVoucher} prefix="Rp" onChange={updateField} />
+          </div>
+        </div>
+
+        {/* Panel Persentase Potongan Channel */}
+        <div className="rounded-3xl border-2 border-darkText bg-white p-6 shadow-brutal sm:p-8 flex flex-col gap-6">
+          <div className="flex flex-col gap-1 border-b-2 border-darkText pb-4">
+            <h3 className="text-xl font-extrabold text-darkText">Potongan Channel Penjualan</h3>
+            <p className="text-xs font-semibold text-darkText/70 leading-relaxed">
+              Persentase komisi, pajak, admin fee, program gratis ongkir, serta alokasi iklan promosi.
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <Field label="Admin fee" name="adminFee" value={form.adminFee} suffix="%" onChange={updateField} />
-            <Field label="Service fee" name="serviceFee" value={form.serviceFee} suffix="%" onChange={updateField} />
-            <Field label="Payment fee" name="paymentFee" value={form.paymentFee} suffix="%" onChange={updateField} />
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <Field label="Admin Fee" name="adminFee" value={form.adminFee} suffix="%" onChange={updateField} />
+            <Field label="Service Fee" name="serviceFee" value={form.serviceFee} suffix="%" onChange={updateField} />
+            <Field label="Payment Fee" name="paymentFee" value={form.paymentFee} suffix="%" onChange={updateField} />
             <Field
-              label="Gratis ongkir"
+              label="Gratis Ongkir Program"
               name="shippingProgramFee"
               value={form.shippingProgramFee}
               suffix="%"
               onChange={updateField}
             />
-            <Field label="Campaign fee" name="campaignFee" value={form.campaignFee} suffix="%" onChange={updateField} />
+            <Field label="Campaign Fee" name="campaignFee" value={form.campaignFee} suffix="%" onChange={updateField} />
             <Field
-              label="Affiliate fee"
+              label="Affiliate Fee"
               name="affiliateFee"
               value={form.affiliateFee}
               suffix="%"
               onChange={updateField}
             />
-            <Field label="Ads fee" name="adsFee" value={form.adsFee} suffix="%" onChange={updateField} />
+            <Field label="Ads Fee" name="adsFee" value={form.adsFee} suffix="%" onChange={updateField} />
             <Field label="Pajak" name="taxFee" value={form.taxFee} suffix="%" onChange={updateField} />
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-4">
           <button
             type="button"
             onClick={saveCurrentCalculation}
-            className="inline-flex h-11 items-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            className="btn-brutal inline-flex h-11 items-center gap-2 rounded-xl border-2 border-darkText bg-brutalBlue px-5 text-sm font-bold text-darkText shadow-brutal hover:shadow-brutal-hover cursor-pointer"
           >
             <Save className="h-4 w-4" />
-            Simpan riwayat
+            Simpan Riwayat
           </button>
           <button
             type="button"
             onClick={resetForm}
-            className="inline-flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            className="btn-brutal inline-flex h-11 items-center gap-2 rounded-xl border-2 border-darkText bg-white px-5 text-sm font-bold text-darkText shadow-brutal hover:shadow-brutal-hover cursor-pointer"
           >
             <Trash2 className="h-4 w-4" />
-            Reset input
+            Reset Input
           </button>
           {!userEmail ? (
-            <p className="self-center text-sm text-slate-500">
-              Riwayat butuh login.{" "}
-              <Link href="/login" className="font-semibold text-emerald-700">
-                Masuk dulu
+            <p className="text-xs font-bold text-darkText/70">
+              Riwayat membutuhkan login.{" "}
+              <Link href="/login" className="font-extrabold text-brutalRed hover:underline decoration-2">
+                Masuk ke Akun
               </Link>
             </p>
           ) : null}
-          {saveMessage ? <p className="self-center text-sm text-emerald-700">{saveMessage}</p> : null}
+          {saveMessage ? (
+            <p className="text-xs font-bold text-darkText bg-brutalYellow border-2 border-darkText px-3 py-1.5 rounded-lg shadow-brutal-sm">
+              {saveMessage}
+            </p>
+          ) : null}
         </div>
       </section>
 
-      <aside className="grid gap-6 self-start">
-        <section className="rounded-2xl border border-slate-200 bg-slate-950 p-5 text-white shadow-sm sm:p-6">
-          <div className="grid gap-4">
-            <div>
-              <p className="text-sm text-slate-300">Harga jual minimal</p>
-              <p className="mt-2 text-3xl font-semibold tracking-tight">
-                {formatCurrency(result.minimumPrice)}
-              </p>
+      {/* ASIDE PANEL - RESULTS */}
+      <aside className="grid gap-8 self-start">
+        {/* Harga Ringkasan Utama */}
+        <section className="rounded-3xl border-2 border-darkText bg-brutalRed p-6 text-white shadow-brutal sm:p-8 flex flex-col gap-6">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-white/95">Harga Jual Minimal</p>
+            <p className="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight">
+              {formatCurrency(result.minimumPrice)}
+            </p>
+          </div>
+          <div className="grid gap-3.5 sm:grid-cols-2">
+            <div className="rounded-2xl bg-white border-2 border-darkText p-4 shadow-brutal-sm text-darkText">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-darkText/60">Harga Aman</p>
+              <p className="mt-1 text-lg font-extrabold">{formatCurrency(result.recommendedPrice)}</p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl bg-white/8 p-4">
-                <p className="text-xs uppercase tracking-[0.14em] text-slate-300">Harga aman</p>
-                <p className="mt-2 text-xl font-semibold">{formatCurrency(result.recommendedPrice)}</p>
-              </div>
-              <div className="rounded-xl bg-white/8 p-4">
-                <p className="text-xs uppercase tracking-[0.14em] text-slate-300">Harga psikologis</p>
-                <p className="mt-2 text-xl font-semibold">{formatCurrency(result.psychologicalPrice)}</p>
-              </div>
+            <div className="rounded-2xl bg-white border-2 border-darkText p-4 shadow-brutal-sm text-darkText">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-darkText/60">Harga Psikologis</p>
+              <p className="mt-1 text-lg font-extrabold">{formatCurrency(result.psychologicalPrice)}</p>
             </div>
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-lg font-semibold text-slate-950">Ringkasan kalkulasi</h2>
-          <dl className="mt-4 grid gap-3 text-sm">
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-slate-500">Total modal</dt>
-              <dd className="font-semibold text-slate-950">{formatCurrency(result.totalBaseCost)}</dd>
+        {/* Visual Fee Breakdown Bar */}
+        <section className="rounded-3xl border-2 border-darkText bg-white p-6 shadow-brutal sm:p-8 flex flex-col gap-5">
+          <div className="flex flex-col gap-1">
+            <h4 className="text-sm font-extrabold text-darkText">Distribusi Harga Aman</h4>
+            <p className="text-[11px] font-semibold text-darkText/70">Bagaimana harga rekomendasi dialokasikan.</p>
+          </div>
+          <div className="h-5 w-full rounded-xl bg-bgLight overflow-hidden flex border-2 border-darkText shadow-brutal-sm">
+            <div
+              style={{ width: `${basePct}%` }}
+              className="bg-brutalGreen h-full transition-all border-r-2 border-darkText"
+              title={`Modal: ${formatPercent(basePct / 100)}`}
+            />
+            <div
+              style={{ width: `${feePct}%` }}
+              className="bg-brutalYellow h-full transition-all border-r-2 border-darkText"
+              title={`Biaya/Potongan: ${formatPercent(feePct / 100)}`}
+            />
+            <div
+              style={{ width: `${profitPct}%` }}
+              className="bg-brutalPurple h-full transition-all"
+              title={`Profit Bersih: ${formatPercent(profitPct / 100)}`}
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-1 text-[10px] font-extrabold uppercase tracking-wider text-darkText">
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded bg-brutalGreen border border-darkText flex-shrink-0" />
+              <span className="truncate">Modal ({formatPercent(basePct / 100)})</span>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-slate-500">Potongan channel</dt>
-              <dd className="font-semibold text-slate-950">{formatPercent(result.totalPercentageFee)}</dd>
+            <div className="flex items-center gap-1.5 justify-center">
+              <span className="h-2.5 w-2.5 rounded bg-brutalYellow border border-darkText flex-shrink-0" />
+              <span className="truncate">Fee ({formatPercent(feePct / 100)})</span>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-slate-500">Biaya tetap tambahan</dt>
-              <dd className="font-semibold text-slate-950">{formatCurrency(result.totalFixedCost)}</dd>
+            <div className="flex items-center gap-1.5 justify-end">
+              <span className="h-2.5 w-2.5 rounded bg-brutalPurple border border-darkText flex-shrink-0" />
+              <span className="truncate">Profit ({formatPercent(profitPct / 100)})</span>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-slate-500">Total potongan di harga aman</dt>
-              <dd className="font-semibold text-slate-950">{formatCurrency(result.totalMarketplaceCut)}</dd>
+          </div>
+        </section>
+
+        {/* Ringkasan Kalkulasi Detail */}
+        <section className="rounded-3xl border-2 border-darkText bg-white p-6 shadow-brutal sm:p-8 flex flex-col gap-5">
+          <h4 className="text-sm font-extrabold text-darkText">Ringkasan Perhitungan</h4>
+          <dl className="grid gap-3.5 text-xs divide-y-2 divide-darkText">
+            <div className="flex items-center justify-between gap-4 pt-3.5 first:pt-0">
+              <dt className="text-darkText/70 font-bold">Total Modal Produk</dt>
+              <dd className="font-extrabold text-darkText">{formatCurrency(result.totalBaseCost)}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-slate-500">Profit di harga aman</dt>
-              <dd className="font-semibold text-emerald-700">{formatCurrency(result.netProfitAtRecommended)}</dd>
+            <div className="flex items-center justify-between gap-4 pt-3.5">
+              <dt className="text-darkText/70 font-bold">Total Potongan Persen</dt>
+              <dd className="font-extrabold text-darkText">{formatPercent(result.totalPercentageFee)}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-slate-500">Margin di harga aman</dt>
-              <dd className="font-semibold text-slate-950">{formatPercent(result.marginAtRecommended)}</dd>
+            <div className="flex items-center justify-between gap-4 pt-3.5">
+              <dt className="text-darkText/70 font-bold">Biaya Transaksi Tetap</dt>
+              <dd className="font-extrabold text-darkText">{formatCurrency(result.totalFixedCost)}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-slate-500">Status</dt>
-              <dd className="font-semibold capitalize text-white">
-                <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs">
+            <div className="flex items-center justify-between gap-4 pt-3.5">
+              <dt className="text-darkText/70 font-bold">Nominal Fee di Harga Aman</dt>
+              <dd className="font-extrabold text-darkText">{formatCurrency(result.totalMarketplaceCut)}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4 pt-3.5">
+              <dt className="text-darkText/70 font-bold">Profit di Harga Aman</dt>
+              <dd className="font-extrabold text-brutalRed">{formatCurrency(result.netProfitAtRecommended)}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4 pt-3.5">
+              <dt className="text-darkText/70 font-bold">Margin di Harga Aman</dt>
+              <dd className="font-extrabold text-darkText">{formatPercent(result.marginAtRecommended)}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4 pt-3.5">
+              <dt className="text-darkText/70 font-bold">Kelayakan Profit</dt>
+              <dd className="font-bold">
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider border-2 border-darkText shadow-brutal-sm ${
+                    result.profitabilityStatus === "untung"
+                      ? "bg-brutalGreen text-darkText"
+                      : "bg-brutalRed text-white"
+                  }`}
+                >
                   {result.profitabilityStatus}
                 </span>
               </dd>
@@ -386,36 +472,39 @@ export function MarketplaceCalculator() {
           </dl>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-lg font-semibold text-slate-950">Simulasi profit</h2>
-          <div className="mt-4 grid gap-3 text-sm">
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-500">Harga uji</span>
-              <span className="font-semibold text-slate-950">{formatCurrency(form.desiredPrice)}</span>
+        {/* Simulasi Harga Uji */}
+        <section className="rounded-3xl border-2 border-darkText bg-white p-6 shadow-brutal sm:p-8 flex flex-col gap-5">
+          <h4 className="text-sm font-extrabold text-darkText">Hasil Simulasi</h4>
+          <dl className="grid gap-3.5 text-xs divide-y-2 divide-darkText">
+            <div className="flex items-center justify-between gap-4 pt-3.5 first:pt-0">
+              <dt className="text-darkText/70 font-bold">Harga Uji</dt>
+              <dd className="font-extrabold text-darkText">{formatCurrency(form.desiredPrice)}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-500">Profit bersih</span>
-              <span className="font-semibold text-slate-950">{formatCurrency(result.desiredPriceProfit)}</span>
+            <div className="flex items-center justify-between gap-4 pt-3.5">
+              <dt className="text-darkText/70 font-bold">Profit Bersih Simulasi</dt>
+              <dd className="font-extrabold text-darkText">{formatCurrency(result.desiredPriceProfit)}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-500">Margin</span>
-              <span className="font-semibold text-slate-950">{formatPercent(result.desiredPriceMargin)}</span>
+            <div className="flex items-center justify-between gap-4 pt-3.5">
+              <dt className="text-darkText/70 font-bold">Margin Simulasi</dt>
+              <dd className="font-extrabold text-darkText">{formatPercent(result.desiredPriceMargin)}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-500">Status</span>
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${
-                  result.simulationStatus === "aman"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : result.simulationStatus === "tipis"
-                      ? "bg-amber-50 text-amber-700"
-                      : "bg-rose-50 text-rose-700"
-                }`}
-              >
-                {result.simulationStatus}
-              </span>
+            <div className="flex items-center justify-between gap-4 pt-3.5">
+              <dt className="text-darkText/70 font-bold">Status Risiko</dt>
+              <dd className="font-bold">
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider border-2 border-darkText shadow-brutal-sm ${
+                    result.simulationStatus === "aman"
+                      ? "bg-brutalGreen text-darkText"
+                      : result.simulationStatus === "tipis"
+                        ? "bg-brutalYellow text-darkText"
+                        : "bg-brutalRed text-white"
+                  }`}
+                >
+                  {result.simulationStatus}
+                </span>
+              </dd>
             </div>
-          </div>
+          </dl>
         </section>
       </aside>
     </div>

@@ -12,7 +12,7 @@ The project is built with the Next.js App Router and focuses on practical pricin
 - Configurable fee presets for common sales channels
 - Profit, margin, and payout simulation
 - Saved calculation history per signed-in user
-- Authentication with Supabase Auth, including email/password and Google sign-in
+- Authentication with email/password and Google OAuth, with session handling managed through Supabase Auth
 
 ## Tech Stack
 
@@ -61,7 +61,7 @@ The application runs locally at `http://localhost:3000`.
 
 ## Notes
 
-- Authentication depends on a properly configured Supabase project.
+- Authentication uses Google OAuth and email/password, with Supabase handling the authentication session layer.
 - Calculation history is stored in the browser for the signed-in user context used by the app.
 
 ## License

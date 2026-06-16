@@ -6,19 +6,26 @@ const points = [
   "Setup ini sengaja menaruh logika hitung di modul terpisah agar mudah dipindah ke Server Actions atau Supabase pada tahap berikutnya.",
 ];
 
+const colors = ["bg-brutalPurple", "bg-brutalYellow", "bg-brutalGreen"];
+
 export default function AboutPage() {
   return (
     <SiteShell
       title="Tentang LarisManis"
       description="Versi awal aplikasi ini berfokus pada akurasi perhitungan dan alur kerja seller yang sederhana, terutama untuk pengguna pemula yang ingin cepat tahu apakah produknya masih untung."
     >
-      <section className="grid gap-4">
-        {points.map((point) => (
-          <article key={point} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-sm leading-7 text-slate-600 sm:text-base">{point}</p>
+      <div className="grid gap-6 max-w-4xl">
+        {points.map((point, index) => (
+          <article
+            key={point}
+            className={`rounded-3xl border-2 border-darkText ${colors[index % colors.length]} p-6 shadow-brutal sm:p-8 transform transition hover:-translate-y-1`}
+          >
+            <p className="text-sm sm:text-base font-semibold leading-relaxed text-darkText">
+              {point}
+            </p>
           </article>
         ))}
-      </section>
+      </div>
     </SiteShell>
   );
 }
