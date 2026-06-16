@@ -1,65 +1,139 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Calculator, Clock3, LineChart, Store } from "lucide-react";
+import { SiteShell } from "@/components/site-shell";
+import { formatCurrency } from "@/lib/format";
+import { calculateSellingPrice } from "@/lib/calculator";
 
-export default function Home() {
+const preview = calculateSellingPrice({
+  productName: "Kemeja Linen Premium",
+  mode: "online",
+  channel: "shopee",
+  productCost: 50000,
+  packingCost: 3500,
+  operationalCost: 5000,
+  targetProfit: 15000,
+  fixedFee: 1250,
+  sellerVoucher: 2000,
+  desiredPrice: 95000,
+  adminFee: 7.5,
+  serviceFee: 1.5,
+  paymentFee: 2,
+  shippingProgramFee: 4,
+  campaignFee: 1.5,
+  affiliateFee: 5,
+  adsFee: 3,
+  taxFee: 0.5,
+});
+
+const highlights = [
+  {
+    title: "Hitung harga jual aman",
+    description: "Masukkan modal, target profit, dan semua potongan channel penjualan dalam satu alur.",
+    icon: Calculator,
+  },
+  {
+    title: "Mode online dan offline",
+    description: "Pilih jalur jualan yang sesuai, dari marketplace sampai toko offline dan reseller.",
+    icon: Store,
+  },
+  {
+    title: "Simulasi profit cepat",
+    description: "Uji harga jual tertentu untuk melihat apakah margin masih aman atau sudah terlalu tipis.",
+    icon: LineChart,
+  },
+  {
+    title: "Riwayat tersimpan",
+    description: "Simpan kalkulasi produk ke browser agar mudah dibandingkan ulang.",
+    icon: Clock3,
+  },
+];
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <SiteShell
+      title="Tentukan harga jual online atau offline tanpa menebak margin."
+      description="LarisManis membantu seller menghitung harga jual minimal, harga aman, dan simulasi profit setelah dipotong admin fee, layanan, komisi merchant, iklan, affiliate, voucher, dan biaya tambahan lain."
+    >
+      <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="grid gap-5 rounded-3xl bg-slate-950 p-6 text-white shadow-sm sm:p-8">
+          <div className="grid gap-3">
+            <span className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">
+              Kalkulator harga jual seller
+            </span>
+            <h2 className="max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
+              Fokus ke profit bersih, bukan cuma markup modal.
+            </h2>
+            <p className="max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+              Sekarang kalkulator bisa dipakai untuk jualan marketplace, merchant seperti GoFood atau GrabFood, sampai penjualan offline dengan komisi reseller.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/calculator"
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              Mulai hitung
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/history"
+              className="inline-flex h-11 items-center rounded-xl border border-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/5"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Lihat riwayat
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm text-slate-500">Preview hasil</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                Kemeja Linen Premium
+              </h2>
+            </div>
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+              Online · Shopee
+            </span>
+          </div>
+          <dl className="mt-6 grid gap-4">
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-sm text-slate-500">Harga minimal</dt>
+              <dd className="text-lg font-semibold text-slate-950">{formatCurrency(preview.minimumPrice)}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-sm text-slate-500">Harga aman</dt>
+              <dd className="text-lg font-semibold text-slate-950">
+                {formatCurrency(preview.recommendedPrice)}
+              </dd>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-sm text-slate-500">Harga psikologis</dt>
+              <dd className="text-lg font-semibold text-slate-950">
+                {formatCurrency(preview.psychologicalPrice)}
+              </dd>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-sm text-slate-500">Profit simulasi</dt>
+              <dd className="text-lg font-semibold text-emerald-700">
+                {formatCurrency(preview.desiredPriceProfit)}
+              </dd>
+            </div>
+          </dl>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {highlights.map(({ title, description, icon: Icon }) => (
+          <article key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+              <Icon className="h-5 w-5" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold text-slate-950">{title}</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p>
+          </article>
+        ))}
+      </section>
+    </SiteShell>
   );
 }
