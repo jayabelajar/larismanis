@@ -7,11 +7,11 @@ import { loadHistory, saveHistory } from "@/lib/storage";
 import { CalculationHistoryItem } from "@/lib/types";
 import { getPresetByKey } from "@/lib/presets";
 
-export function HistoryClient() {
-  const [items, setItems] = useState<CalculationHistoryItem[]>(() => loadHistory());
+export function HistoryClient({ userEmail }: { userEmail: string }) {
+  const [items, setItems] = useState<CalculationHistoryItem[]>(() => loadHistory(userEmail));
 
   function clearHistory() {
-    saveHistory([]);
+    saveHistory(userEmail, []);
     setItems([]);
   }
 
@@ -21,7 +21,7 @@ export function HistoryClient() {
         <Clock3 className="mx-auto h-10 w-10 text-slate-300" />
         <h2 className="mt-4 text-lg font-semibold text-slate-950">Belum ada riwayat</h2>
         <p className="mt-2 text-sm text-slate-500">
-          Simpan hasil kalkulasi dari halaman kalkulator. Data disimpan lokal di browser ini.
+          Simpan hasil kalkulasi dari halaman kalkulator setelah login. Riwayat tersimpan per akun di browser ini.
         </p>
       </section>
     );
@@ -31,7 +31,7 @@ export function HistoryClient() {
     <div className="grid gap-6">
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-slate-500">
-          Menampilkan {items.length} kalkulasi terbaru yang tersimpan di perangkat ini.
+          Menampilkan {items.length} kalkulasi terbaru untuk akun yang sedang login.
         </p>
         <button
           type="button"

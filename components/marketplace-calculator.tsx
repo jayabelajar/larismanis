@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { Save, Trash2 } from "lucide-react";
 import { calculateSellingPrice } from "@/lib/calculator";
@@ -71,6 +74,8 @@ function Field({
 }
 
 export function MarketplaceCalculator() {
+  const router = useRouter();
+  const { data: session } = useSession();
   const [presets] = useState<SalesChannelPreset[]>(() => loadPresets() ?? DEFAULT_PRESETS);
   const [form, setForm] = useState<CalculatorForm>(() => {
     const activePreset = (loadPresets() ?? DEFAULT_PRESETS).find(
@@ -142,7 +147,13 @@ export function MarketplaceCalculator() {
   }
 
   function saveCurrentCalculation() {
-    const history = loadHistory();
+    const userEmail = session?.user?.email;
+    if (!userEmail) {
+      router.push("/login?callbackUrl=/history");
+      return;
+    }
+
+    const history = loadHistory(userEmail);
     const item: CalculationHistoryItem = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
@@ -157,8 +168,8 @@ export function MarketplaceCalculator() {
       totalPercentageFee: result.totalPercentageFee,
     };
 
-    saveHistory([item, ...history].slice(0, 25));
-    setSaveMessage("Riwayat kalkulasi tersimpan di browser ini.");
+    saveHistory(userEmail, [item, ...history].slice(0, 25));
+    setSaveMessage("Riwayat kalkulasi tersimpan untuk akun ini di browser.");
   }
 
   return (
@@ -286,6 +297,14 @@ export function MarketplaceCalculator() {
             <Trash2 className="h-4 w-4" />
             Reset input
           </button>
+          {!session?.user ? (
+            <p className="self-center text-sm text-slate-500">
+              Riwayat butuh login.{" "}
+              <Link href="/login" className="font-semibold text-emerald-700">
+                Masuk dulu
+              </Link>
+            </p>
+          ) : null}
           {saveMessage ? <p className="self-center text-sm text-emerald-700">{saveMessage}</p> : null}
         </div>
       </section>

@@ -3,21 +3,25 @@ import { CalculationHistoryItem, SalesChannelPreset } from "@/lib/types";
 export const HISTORY_STORAGE_KEY = "larismanis:history";
 export const PRESET_STORAGE_KEY = "larismanis:presets";
 
-export function loadHistory(): CalculationHistoryItem[] {
+function buildHistoryStorageKey(userEmail: string) {
+  return `${HISTORY_STORAGE_KEY}:${userEmail.toLowerCase()}`;
+}
+
+export function loadHistory(userEmail: string): CalculationHistoryItem[] {
   if (typeof window === "undefined") {
     return [];
   }
 
   try {
-    const raw = window.localStorage.getItem(HISTORY_STORAGE_KEY);
+    const raw = window.localStorage.getItem(buildHistoryStorageKey(userEmail));
     return raw ? (JSON.parse(raw) as CalculationHistoryItem[]) : [];
   } catch {
     return [];
   }
 }
 
-export function saveHistory(items: CalculationHistoryItem[]) {
-  window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(items));
+export function saveHistory(userEmail: string, items: CalculationHistoryItem[]) {
+  window.localStorage.setItem(buildHistoryStorageKey(userEmail), JSON.stringify(items));
 }
 
 export function loadPresets(): SalesChannelPreset[] | null {

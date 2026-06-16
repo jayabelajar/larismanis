@@ -3,6 +3,15 @@ import { getServerSession } from "next-auth";
 import { SiteShell } from "@/components/site-shell";
 import { authOptions } from "@/lib/auth";
 
+export const metadata = {
+  title: "Akun",
+  description: "Informasi akun pengguna LarisManis.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function AccountPage() {
   const session = await getServerSession(authOptions);
 

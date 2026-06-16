@@ -1,8 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Calculator, Clock3, LineChart, Store } from "lucide-react";
 import { SiteShell } from "@/components/site-shell";
 import { formatCurrency } from "@/lib/format";
 import { calculateSellingPrice } from "@/lib/calculator";
+
+export const metadata: Metadata = {
+  title: "Kalkulator Harga Jual Online dan Offline",
+  description:
+    "Hitung harga jual marketplace, GoFood, GrabFood, ShopeeFood, reseller, dan toko offline dengan simulasi profit bersih.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 const preview = calculateSellingPrice({
   productName: "Kemeja Linen Premium",
@@ -42,8 +52,8 @@ const highlights = [
     icon: LineChart,
   },
   {
-    title: "Riwayat tersimpan",
-    description: "Simpan kalkulasi produk ke browser agar mudah dibandingkan ulang.",
+    title: "Riwayat butuh login",
+    description: "Kalkulator terbuka untuk publik, tetapi riwayat kalkulasi hanya tersedia setelah login.",
     icon: Clock3,
   },
 ];
@@ -79,7 +89,7 @@ export default function HomePage() {
               href="/history"
               className="inline-flex h-11 items-center rounded-xl border border-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/5"
             >
-              Lihat riwayat
+              Riwayat login
             </Link>
           </div>
         </div>
@@ -134,6 +144,25 @@ export default function HomePage() {
           </article>
         ))}
       </section>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "LarisManis",
+            applicationCategory: "BusinessApplication",
+            operatingSystem: "Web",
+            description:
+              "Kalkulator harga jual online dan offline untuk seller marketplace, merchant delivery, dan toko offline.",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "IDR",
+            },
+          }),
+        }}
+      />
     </SiteShell>
   );
 }

@@ -4,6 +4,15 @@ import { LoginForm } from "@/components/login-form";
 import { SiteShell } from "@/components/site-shell";
 import { authOptions, googleAuthEnabled } from "@/lib/auth";
 
+export const metadata = {
+  title: "Login",
+  description: "Masuk ke akun LarisManis.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
 

@@ -4,6 +4,15 @@ import { RegisterForm } from "@/components/register-form";
 import { SiteShell } from "@/components/site-shell";
 import { authOptions, googleAuthEnabled } from "@/lib/auth";
 
+export const metadata = {
+  title: "Daftar",
+  description: "Buat akun LarisManis.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function RegisterPage() {
   const session = await getServerSession(authOptions);
 
